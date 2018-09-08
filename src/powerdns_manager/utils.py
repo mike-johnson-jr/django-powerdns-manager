@@ -909,8 +909,8 @@ def sha1hash(x, salt):
 # alphabet used by NSEC3 (see RFC 4648, Section 7). This alphabet
 # has the property that encoded data maintains its sort order when
 # compared bitwise.
-b32_to_ext_hex = string.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
-                                  '0123456789ABCDEFGHIJKLMNOPQRSTUV')
+b32_to_ext_hex = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZ234567',
+                               '0123456789ABCDEFGHIJKLMNOPQRSTUV')
 
 
 def pdnssec_hash_zone_record(zone_name, record_name):
