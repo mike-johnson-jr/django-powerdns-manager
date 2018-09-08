@@ -259,7 +259,7 @@ def process_axfr_response(origin, nameserver, owner, overwrite=False):
         raise Exception('The zone\'s origin is unknown')
     except BadZone:
         raise Exception('The zone is malformed')
-    except DNSException, e:
+    except DNSException as e:
         if not str(e):
             raise Exception('Transfer Failed')
         raise Exception(str(e))
