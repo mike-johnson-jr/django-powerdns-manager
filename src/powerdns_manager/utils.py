@@ -29,7 +29,7 @@ import time
 import hashlib
 import base64
 import string
-import StringIO
+from io import StringIO
 import re
 
 import dns.zone
