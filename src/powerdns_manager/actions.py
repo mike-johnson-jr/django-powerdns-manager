@@ -34,7 +34,7 @@ try:
 except ImportError:
     from django.db.models.loading import cache
     get_model = cache.get_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from powerdns_manager.utils import generate_api_key
 
@@ -49,17 +49,20 @@ def reset_api_key(modeladmin, request, queryset):
         try:
             dz = DynamicZone.objects.get(domain=domain_obj)
         except DynamicZone.DoesNotExist:
-            messages.error(request, 'Zone is not dynamic: %s' % domain_obj.name)
+            messages.error(request, 'Zone is not dynamic: %s' %
+                           domain_obj.name)
             n = n - 1
         else:
             if dz.api_key:
                 dz.api_key = generate_api_key()
                 dz.save()
             else:
-                messages.error(request, 'Zone is not dynamic: %s' % domain_obj.name)
+                messages.error(request, 'Zone is not dynamic: %s' %
+                               domain_obj.name)
                 n = n - 1
     if n:
-        messages.info(request, 'Successfully reset the API key of %d domains.' % n)
+        messages.info(
+            request, 'Successfully reset the API key of %d domains.' % n)
 reset_api_key.short_description = "Reset API Key"
 
 
@@ -125,9 +128,9 @@ transfer_zone_to_user.short_description = 'Transfer zone to another user'
 
 def create_zone_from_template(modeladmin, request, queryset):
     """Action that creates a new zone using the selected template.
-    
+
     Accepts only one selected template.
-    
+
     """
     if not modeladmin.has_change_permission(request):
         raise PermissionDenied
@@ -137,4 +140,3 @@ def create_zone_from_template(modeladmin, request, queryset):
         return HttpResponseRedirect(reverse('admin:powerdns_manager_zonetemplate_changelist'))
     return HttpResponseRedirect(reverse('template_create_zone', args=(queryset[0].id,)))
 create_zone_from_template.short_description = "Create zone from template"
-
