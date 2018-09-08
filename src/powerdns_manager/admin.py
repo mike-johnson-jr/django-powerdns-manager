@@ -35,7 +35,7 @@ from django.contrib import messages
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from powerdns_manager import settings
 from powerdns_manager.forms import DomainModelForm
@@ -71,7 +71,6 @@ from powerdns_manager.actions import transfer_zone_to_user
 from powerdns_manager.actions import create_zone_from_template
 
 
-
 class DynamicZoneInline(admin.StackedInline):
     model = get_model('powerdns_manager', 'DynamicZone')
     fields = ('is_dynamic', 'api_key')
@@ -85,24 +84,22 @@ class DynamicZoneInline(admin.StackedInline):
     max_num = 1
 
 
-
 class BaseTabularRecordInline(admin.TabularInline):
     RR_TYPE = '__OVERRIDE__'
     form = '__OVERRIDE__'
     model = get_model('powerdns_manager', 'Record')
     extra = 0
     fields = ('name', 'ttl', 'content', 'disabled')
-    
+
     def __init__(self, *args, **kwargs):
         self.verbose_name = '%s Resource Record' % self.RR_TYPE
         self.verbose_name_plural = '%s Resource Records' % self.RR_TYPE
         super(BaseTabularRecordInline, self).__init__(*args, **kwargs)
-        
+
     def get_queryset(self, request):
         """Return only RR_TYPE records"""
         qs = super(BaseTabularRecordInline, self).get_queryset(request)
         return qs.filter(type=self.RR_TYPE)
-
 
 
 class SoaRecordInline(admin.StackedInline):
@@ -112,12 +109,13 @@ class SoaRecordInline(admin.StackedInline):
     extra = 1
     max_num = 1
     verbose_name = 'SOA Resource Record'
-    verbose_name_plural = 'SOA Resource Record' # Only one SOA RR per zone
+    verbose_name_plural = 'SOA Resource Record'  # Only one SOA RR per zone
     # The ``name`` field is not available for editing. It is always set to the
     # name of the domain in ``forms.SoaRecordModelForm.save()`` method.
-    fields = ('ttl', 'primary', 'hostmaster', 'serial', 'refresh', 'retry', 'expire', 'default_ttl')
+    fields = ('ttl', 'primary', 'hostmaster', 'serial',
+              'refresh', 'retry', 'expire', 'default_ttl')
     can_delete = False
-    
+
     def get_queryset(self, request):
         """Return only SOA records"""
         qs = super(SoaRecordInline, self).get_queryset(request)
@@ -128,102 +126,125 @@ class NsRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'NS'
     form = NsRecordModelForm
 
+
 class MxRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'MX'
     form = MxRecordModelForm
     fields = ('name', 'ttl', 'prio', 'content')
-    
+
+
 class SrvRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'SRV'
     form = SrvRecordModelForm
     fields = ('name', 'ttl', 'prio', 'weight', 'port', 'target')
 
+
 class ARecordInline(BaseTabularRecordInline):
     RR_TYPE = 'A'
     form = ARecordModelForm
+
 
 class AaaaRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'AAAA'
     form = AaaaRecordModelForm
 
+
 class CnameRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'CNAME'
     form = CnameRecordModelForm
+
 
 class PtrRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'PTR'
     form = PtrRecordModelForm
 
+
 class TxtRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'TXT'
     form = TxtRecordModelForm
+
 
 class DsRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'DS'
     form = DsRecordModelForm
 
+
 class CertRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'CERT'
     form = CertRecordModelForm
+
 
 class HinfoRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'HINFO'
     form = HinfoRecordModelForm
 
+
 class LocRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'LOC'
     form = LocRecordModelForm
+
 
 class SpfRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'SPF'
     form = SpfRecordModelForm
 
+
 class SshfpRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'SSHFP'
     form = SshfpRecordModelForm
+
 
 class RpRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'RP'
     form = RpRecordModelForm
 
+
 class NaptrRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'NAPTR'
     form = NaptrRecordModelForm
+
 
 class AfsdbRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'AFSDB'
     form = AfsdbRecordModelForm
 
+
 class DnskeyRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'DNSKEY'
     form = DnskeyRecordModelForm
+
 
 class KeyRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'KEY'
     form = KeyRecordModelForm
 
+
 class NsecRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'NSEC'
     form = NsecRecordModelForm
+
 
 class RrsigRecordInline(BaseTabularRecordInline):
     RR_TYPE = 'RRSIG'
     form = RrsigRecordModelForm
 
+
 class EmptyNonTerminalRecordInline(admin.TabularInline):
     """Special inline for empty non-terminals supported by PowerDNS 3.2.
-    
+
     See: http://doc.powerdns.com/dnssec-modes.html#dnssec-direct-database
-    
+
     """
     model = get_model('powerdns_manager', 'Record')
     extra = 0
     verbose_name = 'Empty Non-Terminal Resource Record'
-    verbose_name_plural = 'Empty Non-Terminal Resource Record' # Only one SOA RR per zone
-    fields = ('name', 'type', 'content', 'ttl', 'prio', 'auth', 'ordername', 'change_date')
-    readonly_fields = ('name', 'type', 'content', 'ttl', 'prio', 'auth', 'ordername', 'change_date')
+    verbose_name_plural = 'Empty Non-Terminal Resource Record'  # Only one SOA RR per zone
+    fields = ('name', 'type', 'content', 'ttl', 'prio',
+              'auth', 'ordername', 'change_date')
+    readonly_fields = ('name', 'type', 'content', 'ttl',
+                       'prio', 'auth', 'ordername', 'change_date')
     can_delete = False
-    
+
     def get_queryset(self, request):
         """Return only Empty Non-Terminal records"""
         qs = super(EmptyNonTerminalRecordInline, self).get_queryset(request)
@@ -236,7 +257,7 @@ class DomainMetadataInline(admin.TabularInline):
     extra = 0
     verbose_name_plural = 'Domain Metadata'
 
-    
+
 class CryptoKeyInline(admin.TabularInline):
     model = get_model('powerdns_manager', 'CryptoKey')
     fields = ('flags', 'active', 'content')
@@ -256,22 +277,23 @@ class DomainAdmin(admin.ModelAdmin):
     fields = ('date_modified', 'name', 'type', 'master', 'created_by')
     readonly_fields = ('date_modified', 'created_by')
     #list_display = ('name', 'export_zone_html_link', 'type', 'master', 'date_modified', 'created_by')
-    #list_display -- Set by get_list_display()
+    # list_display -- Set by get_list_display()
     #list_filter = ['type', 'created_by']
-    #list_filter -- Set by get_list_filter()
+    # list_filter -- Set by get_list_filter()
     search_fields = ['name', 'master', 'created_by']
     verbose_name = 'zone'
     verbose_name_plural = 'zones'
     save_on_top = True
-    actions = [reset_api_key, set_domain_type_bulk, set_ttl_bulk, force_serial_update, clone_zone, transfer_zone_to_user]
+    actions = [reset_api_key, set_domain_type_bulk, set_ttl_bulk,
+               force_serial_update, clone_zone, transfer_zone_to_user]
     change_list_template = 'powerdns_manager/domain_changelist.html'
     change_form_template = 'powerdns_manager/domain_changeform.html'
-    
+
     #
     # Build the ``inlines`` list. Only inlines for enabled RR types are included.
-    # 
+    #
     inlines = [DynamicZoneInline]
-    
+
     # Resource Record type to Resource Record Inline Map
     RR_INLINE_MAP = {
         'A':        ARecordInline,
@@ -297,76 +319,78 @@ class DomainAdmin(admin.ModelAdmin):
         'SRV':      SrvRecordInline,
         'TXT':      TxtRecordInline,
     }
-    
+
     # Add RR inlines
     for RR_TYPE in settings.PDNS_ENABLED_RR_TYPES:
         inlines.append(RR_INLINE_MAP[RR_TYPE])
-    
+
     # Add other inlines
-    #inlines.append(EmptyNonTerminalRecordInline)
+    # inlines.append(EmptyNonTerminalRecordInline)
     inlines.append(DomainMetadataInline)
     inlines.append(CryptoKeyInline)
-    #inlines.append(CommentInline)
-    
+    # inlines.append(CommentInline)
+
     def get_list_display(self, request):
-        list_display = ['name', 'export_zone_html_link', 'type', 'master', 'date_modified']
+        list_display = ['name', 'export_zone_html_link',
+                        'type', 'master', 'date_modified']
         if request.user.is_superuser:
             list_display.append('created_by')
         return list_display
-    
+
     def get_list_filter(self, request):
         list_filter = ['type', ]
         if request.user.is_superuser:
             list_filter.append('created_by')
         return list_filter
-    
+
     def get_queryset(self, request):
         qs = super(DomainAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
             # Non-superusers see the domains they have created
             qs = qs.filter(created_by=request.user)
         return qs
-    
+
     def save_model(self, request, obj, form, change):
         if not change:
             obj.created_by = request.user
         obj.save()
         # The zone serial is updated after all RRs have been saved.
-        # This is accomplished by sending the ``zone_saved`` signal in ``save_related()``
-    
+        # This is accomplished by sending the ``zone_saved`` signal in
+        # ``save_related()``
+
     def save_related(self, request, form, formsets, change):
         """Calls the signal that rectifies the zone.
-        
+
         In ModelAdmin.add_view() and ModelAdmin.change_view() the method
         save_model() is normally called before save_related().
-        
+
         Using a post_save signal on the Domain or Record models is not
         efficient. In case of the Domain model, rectify_zone() would not process
         any new data in the associated records. In case of the Record model,
         rectify_zone() would be called multiple times and only the last call
         would be the effective one.
-        
+
         rectify_zone() must be called after all the records and the domain have
         been saved to the database.
-        
+
         Here we execute the parent save_related() and then we call rectify zone
         through a custom signal.
-        
+
         """
         super(DomainAdmin, self).save_related(request, form, formsets, change)
         # Send the zone_saved signal
         zone_saved.send(sender=self.model, instance=form.instance)
-    
+
     def response_change(self, request, obj):
         """Determines the HttpResponse for the change_view stage.
-        
+
         Extends admin.ModelAdmin's ``response_change()`` method to support
         the domain tools.
-        
+
         """
 
         # See template ``powerdns_manager/domain_change_form.html``
-        
+
         if "_transfer" in request.POST:
             return HttpResponseRedirect(reverse('zone_transfer', args=(obj.id,)))
         elif "_clone" in request.POST:
@@ -383,7 +407,6 @@ class DomainAdmin(admin.ModelAdmin):
 admin.site.register(get_model('powerdns_manager', 'Domain'), DomainAdmin)
 
 
-
 class TsigKeyAdmin(admin.ModelAdmin):
     fields = ('name', 'algorithm', 'secret', 'date_modified')
     readonly_fields = ('date_modified', )
@@ -392,21 +415,20 @@ class TsigKeyAdmin(admin.ModelAdmin):
     search_fields = ('name', )
     verbose_name = 'TSIG Key'
     verbose_name_plural = 'TSIG Keys'
-    
+
     def get_queryset(self, request):
         qs = super(TsigKeyAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
             # Non-superusers see the records they have created
             qs = qs.filter(created_by=request.user)
         return qs
-    
+
     def save_model(self, request, obj, form, change):
         if not change:
             obj.created_by = request.user
         obj.save()
-    
-admin.site.register(get_model('powerdns_manager', 'TsigKey'), TsigKeyAdmin)
 
+admin.site.register(get_model('powerdns_manager', 'TsigKey'), TsigKeyAdmin)
 
 
 class SuperMasterAdmin(admin.ModelAdmin):
@@ -416,9 +438,9 @@ class SuperMasterAdmin(admin.ModelAdmin):
     search_fields = ('nameserver', 'account')
     verbose_name = 'SuperMaster'
     verbose_name_plural = 'SuperMasters'
-    
-admin.site.register(get_model('powerdns_manager', 'SuperMaster'), SuperMasterAdmin)
 
+admin.site.register(get_model('powerdns_manager',
+                              'SuperMaster'), SuperMasterAdmin)
 
 
 class ZoneTemplateAdmin(admin.ModelAdmin):
@@ -429,19 +451,18 @@ class ZoneTemplateAdmin(admin.ModelAdmin):
     verbose_name = _('template')
     verbose_name_plural = _('templates')
     actions = [create_zone_from_template, ]
-    
+
     def get_queryset(self, request):
         qs = super(ZoneTemplateAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
             # Non-superusers see the templates they have created
             qs = qs.filter(created_by=request.user)
         return qs
-    
+
     def save_model(self, request, obj, form, change):
         if not change:
             obj.created_by = request.user
         obj.save()
-    
-admin.site.register(get_model('powerdns_manager', 'ZoneTemplate'), ZoneTemplateAdmin)
 
-
+admin.site.register(get_model('powerdns_manager',
+                              'ZoneTemplate'), ZoneTemplateAdmin)
