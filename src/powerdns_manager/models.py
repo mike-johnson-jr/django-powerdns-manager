@@ -478,7 +478,7 @@ class DynamicZone(models.Model):
 
     """
     domain = models.OneToOneField('powerdns_manager.Domain', related_name='%(app_label)s_%(class)s_domain', verbose_name=_(
-        'domain'), help_text=_("""Select the domain, the A and AAAA records of which might be updated dynamically over HTTP."""))
+        'domain'), help_text=_("""Select the domain, the A and AAAA records of which might be updated dynamically over HTTP.""", on_delete=models.CASCADE))
     is_dynamic = models.BooleanField(default=False, verbose_name=_(
         'Dynamic zone'), help_text="""Check to mark this zone as dynamic. An API key will be generated for you so as to be able to update the A nd AAAA records IP addresses over HTTP.""")
     api_key = models.CharField(max_length=64, null=True, verbose_name=_(
