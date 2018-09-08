@@ -87,7 +87,7 @@ class Domain(models.Model):
     date_modified = models.DateTimeField(
         auto_now=True, null=True, verbose_name=_('Last Modified'))
     created_by = models.ForeignKey(AUTH_USER_MODEL, related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_(
-        'owner username'), help_text="""The Django user this zone belongs to.""")
+        'owner username'), help_text="""The Django user this zone belongs to.""", on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'domains'
@@ -198,7 +198,7 @@ class Record(models.Model):
 
     # domain -> specs state 'default null'. Consider adding: null=True
     domain = models.ForeignKey('powerdns_manager.Domain', related_name='%(app_label)s_%(class)s_domain', verbose_name=_(
-        'domain'), help_text=_("""Select the domain this record belongs to."""))
+        'domain'), help_text=_("""Select the domain this record belongs to."""), on_delete=models.CASCADE)
     name = models.CharField(max_length=255, null=True, db_index=True, verbose_name=_(
         'name'), help_text="""Actual name of a record. Must not end in a '.' and be fully qualified - it is not relative to the name of the domain!  For example: www.test.com (no trailing dot)""")
     # See section 8.5 about why the type field allows NULL. (PowerDNS 3.2 and above)
@@ -329,7 +329,7 @@ class Comment(models.Model):
     """Model for PowerDNS comments."""
 
     domain = models.ForeignKey('powerdns_manager.Domain', related_name='%(app_label)s_%(class)s_domain',
-                               db_index=True, verbose_name=_('domain'), help_text=_("""Select the domain this comment belongs to."""))
+                               db_index=True, verbose_name=_('domain'), help_text=_("""Select the domain this comment belongs to."""), on_delete=models.CASCADE)
     name = models.CharField(max_length=255, verbose_name=_(
         'name'), help_text="""Enter a name for this comment.""")
     type = models.CharField(max_length=10, verbose_name=_(
@@ -377,7 +377,7 @@ class DomainMetadata(models.Model):
         ('TSIG-ALLOW-AXFR', 'TSIG-ALLOW-AXFR'),
     )
     domain = models.ForeignKey('powerdns_manager.Domain', related_name='%(app_label)s_%(class)s_domain',
-                               db_index=True, verbose_name=_('domain'), help_text=_("""Select the domain this record belongs to."""))
+                               db_index=True, verbose_name=_('domain'), help_text=_("""Select the domain this record belongs to."""), on_delete=models.CASCADE)
     kind = models.CharField(max_length=16, choices=PER_ZONE_METADATA_CHOICES, verbose_name=_(
         'setting'), help_text="""Select a setting.""")
     # TODO: Check if content may be empty
@@ -406,7 +406,7 @@ class CryptoKey(models.Model):
 
     """
     domain = models.ForeignKey('powerdns_manager.Domain', related_name='%(app_label)s_%(class)s_domain',
-                               db_index=True, verbose_name=_('domain'), help_text=_("""Select the domain this record belongs to."""))
+                               db_index=True, verbose_name=_('domain'), help_text=_("""Select the domain this record belongs to."""), on_delete=models.CASCADE)
     flags = models.PositiveIntegerField(
         verbose_name=_('flags'), help_text="""Key flags.""")
     active = models.BooleanField(default=False, verbose_name=_(
@@ -451,7 +451,7 @@ class TsigKey(models.Model):
     date_modified = models.DateTimeField(
         auto_now=True, verbose_name=_('Last Modified'))
     created_by = models.ForeignKey(AUTH_USER_MODEL, related_name='%(app_label)s_%(class)s_created_by', null=True, verbose_name=_(
-        'created by'), help_text="""The Django user this TSIG key belongs to.""")
+        'created by'), help_text="""The Django user this TSIG key belongs to.""", on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'tsigkeys'
@@ -526,7 +526,7 @@ class ZoneTemplate(models.Model):
     date_modified = models.DateTimeField(
         auto_now=True, verbose_name=_('Last Modified'))
     created_by = models.ForeignKey(AUTH_USER_MODEL, related_name='%(app_label)s_%(class)s_created_by', verbose_name=_(
-        'template creator'), help_text="""The Django user this template belongs to.""")
+        'template creator'), help_text="""The Django user this template belongs to.""", on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'zonetemplates'
