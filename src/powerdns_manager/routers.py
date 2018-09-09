@@ -83,13 +83,13 @@ class PowerdnsManagerDbRouter(object):
         """Point all operations on powerdns_manager models to 'powerdns'"""
         #raise Exception(hints)
         #raise Exception( 'READ OBJ: ' + str(type(hints['instance'])) + str(hints) )
-        elif model._meta.app_label == 'powerdns_manager':
+        if model._meta.app_label == 'powerdns_manager':
             return 'powerdns'
         return None
 
     def db_for_write(self, model, **hints):
         """Point all operations on powerdns_manager models to 'powerdns'"""
-        elif model._meta.app_label == 'powerdns_manager':
+        if model._meta.app_label == 'powerdns_manager':
             return 'powerdns'
         return None
 
