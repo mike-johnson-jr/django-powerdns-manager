@@ -55,7 +55,7 @@ http://wiki.powerdns.com/trac/wiki/fields
 # For backwards compatibility here we check whether ``django_settings`` contains
 # this setting and use it, otherwise use ``auth.User`` as a fallback.
 
-AUTH_USER_MODEL = django_settings.AUTH_USER_MODEL
+AUTH_USER_MODEL = django.contrib.auth.get_user_model()
 
 
 class Domain(models.Model):
