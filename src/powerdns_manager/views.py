@@ -38,7 +38,7 @@ from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 try:
     from django.apps import apps
     get_model = apps.get_model
