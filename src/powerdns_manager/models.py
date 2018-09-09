@@ -54,8 +54,10 @@ http://wiki.powerdns.com/trac/wiki/fields
 # Supporting custom user models requires this setting.
 # For backwards compatibility here we check whether ``django_settings`` contains
 # this setting and use it, otherwise use ``auth.User`` as a fallback.
-from django.contrib.auth import get_user_model
-AUTH_USER_MODEL = get_user_model()
+if hasattr(django_settings, 'AUTH_USER_MODEL'):
+    AUTH_USER_MODEL = django_settings.AUTH_USER_MODEL
+else:
+    AUTH_USER_MODEL = 'auth.User'
 
 
 class Domain(models.Model):

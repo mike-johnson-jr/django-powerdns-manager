@@ -24,27 +24,28 @@
 #  limitations under the License.
 #
 
+
 class PowerdnsManagerDbRouter(object):
     """A router to control all database operations on models in
     the 'powerdns_manager' application.
-    
+
     Based on the default example router of Django 1.4:
-    
+
         https://docs.djangoproject.com/en/1.4/topics/db/multi-db/#an-example
-    
+
     It is highly recommended to configure django-powerdns-manager to use a
     different database than the rest of the apps of the Django project for
     security and performance reasons.
-    
+
     The ``PowerdnsManagerDbRouter`` database router is provided for this
     purpose. All you need to do, is configure an extra database in
     ``settings.py`` named ``powerdns`` and add this router to the
     ``DATABASE_ROUTERS`` list.
-    
+
     The following example assumes using SQLite databases, but your are free to
     use any database backend you want, provided that it is also supported by
     the PowerDNS server software::
-    
+
         DATABASES = {
             'default': {    # Used by all apps of the Django project except django-powerdns-manager
                 'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -65,33 +66,29 @@ class PowerdnsManagerDbRouter(object):
         }
 
         DATABASE_ROUTERS = ['powerdns_manager.routers.PowerdnsManagerDbRouter']
-    
+
     The configuration above indicates that ``main.db`` will be used by all
     the apps of the Django project, except ``django-powerdns-manager``. The
     ``powerdns.db`` database will be used by ``django-powerdns-manager``.
     PowerDNS should also be configured to use ``powerdns.db``.
-    
+
     Run syncdb like this:
-    
+
         python manage.py syncdb
         python manage.py syncdb --database=powerdns
-    
+
     """
 
     def db_for_read(self, model, **hints):
         """Point all operations on powerdns_manager models to 'powerdns'"""
         #raise Exception(hints)
         #raise Exception( 'READ OBJ: ' + str(type(hints['instance'])) + str(hints) )
-        if model._meta.app_label == 'auth':
-            return 'default'
         elif model._meta.app_label == 'powerdns_manager':
             return 'powerdns'
         return None
 
     def db_for_write(self, model, **hints):
         """Point all operations on powerdns_manager models to 'powerdns'"""
-        if model._meta.app_label == 'auth':
-            return 'default'
         elif model._meta.app_label == 'powerdns_manager':
             return 'powerdns'
         return None
@@ -109,4 +106,3 @@ class PowerdnsManagerDbRouter(object):
         elif app_label == 'powerdns_manager':
             return False
         return None
-
