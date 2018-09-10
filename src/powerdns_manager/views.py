@@ -29,7 +29,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text as force_unicode
@@ -85,8 +85,8 @@ def import_zone_view(request):
                 info_dict = {
                     'strerror': mark_safe(str(e)),
                 }
-                return render_to_response('powerdns_manager/zone/import/error.html', info_dict)
-            return render_to_response('powerdns_manager/zone/import/success.html', {})
+                return render(request, 'powerdns_manager/zone/import/error.html', info_dict)
+            return render(request, 'powerdns_manager/zone/import/success.html', {})
 
     else:
         form = ZoneImportForm()  # An unbound form
@@ -94,8 +94,8 @@ def import_zone_view(request):
     info_dict = {
         'form': form,
     }
-    return render_to_response(
-        'powerdns_manager/zone/import/zonefile.html', info_dict, context_instance=RequestContext(request))
+    return render(
+        request, 'powerdns_manager/zone/import/zonefile.html', info_dict)
 
 
 @login_required
@@ -115,9 +115,9 @@ def import_axfr_view(request):
                 info_dict = {
                     'strerror': mark_safe(str(e)),
                 }
-                return render_to_response('powerdns_manager/zone/import/error.html', {})
+                return render(request, 'powerdns_manager/zone/import/error.html', {})
             info_dict = {'is_axfr': True}
-            return render_to_response('powerdns_manager/zone/import/success.html', info_dict)
+            return render(request, 'powerdns_manager/zone/import/success.html', info_dict)
 
     else:
         form = AxfrImportForm()  # An unbound form
@@ -125,8 +125,8 @@ def import_axfr_view(request):
     info_dict = {
         'form': form,
     }
-    return render_to_response(
-        'powerdns_manager/zone/import/axfr.html', info_dict, context_instance=RequestContext(request))
+    return render(
+        request, 'powerdns_manager/zone/import/axfr.html', info_dict)
 
 
 @login_required
@@ -142,15 +142,15 @@ def export_zone_view(request, origin):
         messages.error(
             request, 'Permission denied for domain: %s' % obj_display)
         # Redirect to the Domain changelist.
-        return render_to_response('powerdns_manager/zone/import/error.html', {})
+        return render(request, 'powerdns_manager/zone/import/error.html', {})
         return HttpResponseRedirect(reverse('admin:powerdns_manager_domain_changelist'))
     else:
         info_dict = {
             'zone_text': generate_zone_file(origin),
             'origin': origin,
         }
-        return render_to_response(
-            'powerdns_manager/zone/export/zonefile.html', info_dict, context_instance=RequestContext(request))
+        return render(
+            request, 'powerdns_manager/zone/export/zonefile.html', info_dict)
 
 
 @csrf_exempt
@@ -351,8 +351,8 @@ def zone_set_type_view(request, id_list):
         'form': form,
         'id_list': id_list,
     }
-    return render_to_response(
-        'powerdns_manager/zone/set_type.html', info_dict, context_instance=RequestContext(request))
+    return render(
+        request, 'powerdns_manager/zone/set_type.html', info_dict)
 
 
 @login_required
@@ -443,8 +443,8 @@ def zone_set_ttl_view(request, id_list):
         'form': form,
         'id_list': id_list,
     }
-    return render_to_response(
-        'powerdns_manager/zone/set_ttl.html', info_dict, context_instance=RequestContext(request))
+    return render(
+        request, 'powerdns_manager/zone/set_ttl.html', info_dict)
 
 
 @login_required
@@ -620,8 +620,8 @@ def zone_clone_view(request, zone_id):
         'form': form,
         'zone_id': zone_id,
     }
-    return render_to_response(
-        'powerdns_manager/zone/clone.html', info_dict, context_instance=RequestContext(request))
+    return render(request,
+                  'powerdns_manager/zone/clone.html', info_dict)
 
 
 @login_required
@@ -698,8 +698,8 @@ def zone_transfer_view(request, id_list):
         'form': form,
         'id_list': id_list,
     }
-    return render_to_response(
-        'powerdns_manager/zone/transfer.html', info_dict, context_instance=RequestContext(request))
+    return render(request,
+                  'powerdns_manager/zone/transfer.html', info_dict)
 
 
 @login_required
@@ -763,5 +763,5 @@ def template_create_zone_view(request, template_id):
         'form': form,
         'template_id': template_id,
     }
-    return render_to_response(
-        'powerdns_manager/template/create_zone.html', info_dict, context_instance=RequestContext(request))
+    return render(request,
+                  'powerdns_manager/template/create_zone.html', info_dict)
