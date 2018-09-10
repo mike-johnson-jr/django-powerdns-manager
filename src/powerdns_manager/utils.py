@@ -189,7 +189,7 @@ def generate_api_key():
 def clean_zonefile(data):
     EOL = '\n'
     lines = []
-    f = StringIO.StringIO(data)
+    f = StringIO(data)
     for line in f:
         line = line.strip()
         if line:
@@ -561,7 +561,7 @@ def generate_zone_file(origin):
     # Export text (from the source code of
     # http://www.dnspython.org/docs/1.10.0/html/dns.zone.Zone-class.html#to_file)
     EOL = '\n'
-    f = StringIO.StringIO()
+    f = StringIO()
     f.write('$ORIGIN %s%s' % (origin, EOL))
     zone.to_file(f, sorted=True, relativize=False, nl=EOL)
     data = f.getvalue()
