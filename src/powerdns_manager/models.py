@@ -96,7 +96,7 @@ class Domain(models.Model):
         get_latest_by = 'date_modified'
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 #    def save(self, *args, **kwargs):
@@ -243,7 +243,7 @@ class Record(models.Model):
         # SEE:
         # http://stackoverflow.com/questions/1578195/django-create-index-non-unique-multiple-column
 
-    def __unicode__(self):
+    def __str__(self):
         # return '%s %s' % (self.type, self.name)
         return self.name
 
@@ -321,7 +321,7 @@ class SuperMaster(models.Model):
         #    #('nameserver', 'account'),    # TODO: check what account really is. maybe we need to add a created_by field here.
         #)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nameserver
 
 
@@ -356,7 +356,7 @@ class Comment(models.Model):
             ['domain', 'modified_at'],
         ]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -395,7 +395,7 @@ class DomainMetadata(models.Model):
         get_latest_by = 'date_modified'
         ordering = ['kind']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.kind
 
 
@@ -426,7 +426,7 @@ class CryptoKey(models.Model):
         get_latest_by = 'date_modified'
         ordering = ['domain']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.domain.name
 
 
@@ -463,7 +463,7 @@ class TsigKey(models.Model):
             ('name', 'algorithm'),
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -493,7 +493,7 @@ class DynamicZone(models.Model):
         get_latest_by = 'date_modified'
         ordering = ['-domain']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.domain.name
 
     def save(self, *args, **kwargs):
@@ -538,5 +538,5 @@ class ZoneTemplate(models.Model):
             ('name', 'created_by'),
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
