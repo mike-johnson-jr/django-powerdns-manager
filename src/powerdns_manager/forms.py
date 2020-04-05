@@ -310,7 +310,7 @@ class SrvRecordModelForm(BaseRecordModelForm):
         """Set initial values for extra ModelForm fields."""
         if 'instance' in kwargs:
             instance = kwargs['instance']
-            if instance.pk is not None:    # This check asserts that this is an EDIT
+            if instance is not None:    # This check asserts that this is an EDIT
                 if instance.type == 'SRV':
                     bits = instance.content.split()
                     kwargs['initial'] = {
